@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+   android:id="@+id/widget29"
+   android:layout_width="fill_parent"
+   android:layout_height="fill_parent" >
+    <Button
+       android:id="@+id/takePicture"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:layout_centerHorizontal="true"
+       android:layout_centerVertical="true"
+       android:text="@string/take_picture" />
+    
+     <Button
+       android:id="@+id/gallery"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:layout_centerHorizontal="true"
+       android:layout_centerVertical="true"
+       android:layout_below="@id/takePicture"
+       android:text="@string/gallery" />
+     
+     <Button
+       android:id="@+id/map"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:layout_centerHorizontal="true"
+       android:layout_centerVertical="true"
+       android:layout_below="@id/gallery"
+       android:text="@string/map" />
+
+</RelativeLayout>
