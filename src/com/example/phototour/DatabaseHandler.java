@@ -1,11 +1,16 @@
 package com.example.phototour;
 
 import android.content.ContentValues;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteDatabase.CursorFactory;
 import android.database.sqlite.SQLiteOpenHelper;
+import com.example.phototour.Photographs;
 
 public class DatabaseHandler extends SQLiteOpenHelper{
 	
@@ -69,5 +74,29 @@ public class DatabaseHandler extends SQLiteOpenHelper{
         Photographs photograph = new Photographs(Integer.parseInt(cursor.getString(0)), cursor.getString(1), cursor.getString(2), cursor.getString(3), cursor.getString(4));
         return photograph;
 	}
-
+	
+	public List<Photographs> getPhotographs(){
+		
+		List<Photographs> list = new ArrayList<Photographs>();
+		SQLiteDatabase db = this.getReadableDatabase();
+		String selectQuery = "SELECT * FROM " + TABLE_PHOTOGRAPHS;
+		Cursor cursor = db.rawQuery(selectQuery, null);
+		
+		if(cursor.moveToFirst()){
+			do{
+				Photographs photograph = new Photographs();
+				photograph.setID(Integer.valueOf(cursor.getString(0)));
+				photograph.setName(cursor.getString(1));
+				photograph.setLatitude(cursor.getString(2));
+				photograph.setLongitude(cursor.getString(3));
+				photograph.setTimeStamp(cursor.getString(4));
+				list.add(photograph);
+			}while(cursor.moveToNext());
+		}
+		cursor.close();
+		db.close();
+		return list;
+	}
+	
 }
+

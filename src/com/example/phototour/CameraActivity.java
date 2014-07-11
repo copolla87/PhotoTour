@@ -63,7 +63,7 @@ public class CameraActivity extends Activity {
 	    if (requestCode == CAMERA_CAPTURE_IMAGE_REQUEST_CODE && resultCode == RESULT_OK){
 	    	galleryAddPic();
 	    	previewCapturedImage();
-	    	
+	    	newPhotograph(imgPreview);
 	    } else if (resultCode == RESULT_CANCELED){
 	    	Toast.makeText(getApplicationContext(), "user cancelled", Toast.LENGTH_SHORT).show();
 	    } else {
@@ -103,6 +103,7 @@ public class CameraActivity extends Activity {
 	public void onBackPressed(){
 		Intent backIntent = new Intent(this, MainMenu.class);
 		startActivity(backIntent);
+		finish();
 	}
 	
 	
@@ -115,6 +116,7 @@ public class CameraActivity extends Activity {
 		fileUri = getOutputMediaFileUri(MEDIA_TYPE_IMAGE);
 		intent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
 		startActivityForResult(intent, CAMERA_CAPTURE_IMAGE_REQUEST_CODE);
+		finish();
 	}
 	
 	public Uri getOutputMediaFileUri(int type){
@@ -162,5 +164,13 @@ public class CameraActivity extends Activity {
 	    Uri contentUri = Uri.fromFile(f);
 	    mediaScanIntent.setData(contentUri);
 	    this.sendBroadcast(mediaScanIntent);
+	}
+	
+	//add photograph to database(with slightly different name though - need fix)
+	private void newPhotograph(View view){
+		String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
+		DatabaseHandler dbHandler = new DatabaseHandler(this);
+		Photographs photograph = new Photographs(timeStamp.toString(), String.valueOf(gps.getLatitude()), String.valueOf(gps.getLongitude()), timeStamp.toString());
+		dbHandler.addPhotograph(photograph);
 	}
 }
