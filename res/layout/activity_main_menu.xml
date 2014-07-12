@@ -9,7 +9,7 @@
        android:layout_height="wrap_content"
        android:layout_centerHorizontal="true"
        android:layout_centerVertical="true"
-       android:text="@string/take_picture" />
+       android:background="@drawable/camera" />
     
      <Button
        android:id="@+id/gallery"
@@ -18,7 +18,7 @@
        android:layout_centerHorizontal="true"
        android:layout_centerVertical="true"
        android:layout_below="@id/takePicture"
-       android:text="@string/gallery" />
+       android:background="@drawable/gallery" />
      
      <Button
        android:id="@+id/map"
@@ -27,6 +27,6 @@
        android:layout_centerHorizontal="true"
        android:layout_centerVertical="true"
        android:layout_below="@id/gallery"
-       android:text="@string/map" />
+       android:background="@drawable/mapsalt" />
 
 </RelativeLayout>

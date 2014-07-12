@@ -1,16 +1,41 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@android:color/black"
     tools:context="${relativePackage}.${activityClass}" >
 
-
+	
     <ImageView
         android:id="@+id/imgPreview"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        android:layout_weight="1" />
- 
+        android:layout_width="wrap_content"  
+        android:layout_height="wrap_content"  
+        android:layout_gravity="center" 
+        android:layout_weight="1"
+        android:layout_margin="5dp"/>
 
-</LinearLayout>
+ <RelativeLayout
+     android:layout_width="wrap_content"
+     android:layout_height="wrap_content"
+     android:layout_alignParentBottom="true"
+     android:layout_alignParentLeft="true"
+     android:gravity="bottom" >
+
+     <Button
+         android:id="@+id/button_Camera"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:layout_alignParentLeft="true"
+         android:background="@drawable/ic_menu_camera"
+         android:onClick="cameraActivity" />
+
+     <Button
+         android:id="@+id/button_Map"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:layout_alignParentRight="true"
+         android:onClick="mapActivity"
+         android:background="@drawable/ic_menu_mapmode" />
+ </RelativeLayout>
+
+</RelativeLayout>

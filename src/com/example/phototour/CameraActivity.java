@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.Locale;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -16,6 +17,7 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -27,7 +29,6 @@ public class CameraActivity extends Activity {
 	File file =new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "PHOTO MAP");
 
 	private ImageView imgPreview;
-	
 	GPSTracker gps;
 	
 	@Override
@@ -62,8 +63,8 @@ public class CameraActivity extends Activity {
 	{
 	    if (requestCode == CAMERA_CAPTURE_IMAGE_REQUEST_CODE && resultCode == RESULT_OK){
 	    	galleryAddPic();
+	    	//newPhotograph(imgPreview);
 	    	previewCapturedImage();
-	    	newPhotograph(imgPreview);
 	    } else if (resultCode == RESULT_CANCELED){
 	    	Toast.makeText(getApplicationContext(), "user cancelled", Toast.LENGTH_SHORT).show();
 	    } else {
@@ -115,8 +116,7 @@ public class CameraActivity extends Activity {
 		Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 		fileUri = getOutputMediaFileUri(MEDIA_TYPE_IMAGE);
 		intent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
-		startActivityForResult(intent, CAMERA_CAPTURE_IMAGE_REQUEST_CODE);
-		finish();
+		startActivityForResult(intent, CAMERA_CAPTURE_IMAGE_REQUEST_CODE); 
 	}
 	
 	public Uri getOutputMediaFileUri(int type){
@@ -172,5 +172,21 @@ public class CameraActivity extends Activity {
 		DatabaseHandler dbHandler = new DatabaseHandler(this);
 		Photographs photograph = new Photographs(timeStamp.toString(), String.valueOf(gps.getLatitude()), String.valueOf(gps.getLongitude()), timeStamp.toString());
 		dbHandler.addPhotograph(photograph);
+	}
+	
+	
+	//method for button over image view to returns as on camera activity
+	public void cameraActivity(View view){
+		Intent cameraIntent = new Intent(this,
+                CameraActivity.class);
+		startActivity(cameraIntent);
+		finish();
+	}
+	
+	//method for button over image view to send as to Map activity
+	public void mapActivity(View view){
+		Intent mapIntent = new Intent(this, MapActivity.class);
+		startActivity(mapIntent);
+		finish();
 	}
 }

@@ -9,5 +9,6 @@
     <string name="title_activity_gallery">Gallery</string>
     <string name="map">Map</string>
     <string name="title_activity_map">MapActivity</string>
+    <string name="title_activity_display_image_captured">DisplayImageCaptured</string>
 
 </resources>
