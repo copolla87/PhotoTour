@@ -4,7 +4,7 @@ package com.example.phototour;
 
 public class Photographs {
 	
-	int _id;
+	String _id;
 	String _name;
 	String _Latitude;
 	String _Longitude;
@@ -16,7 +16,7 @@ public class Photographs {
 	}
 	
 	//constructor
-	public Photographs(int id, String name, String latitude, String longitude, String timeStamp){
+	public Photographs(String id, String name, String latitude, String longitude, String timeStamp){
 		this._id = id;
 		this._name = name;
 		this._Latitude = latitude;
@@ -33,11 +33,11 @@ public class Photographs {
 	}
 	
 	//ACCESSORS
-	public int getID(){
+	public String getID(){
 		return this._id;
 	}
 	
-	public void setID(int id){
+	public void setID(String id){
 		this._id = id;
 	}
 	

@@ -25,9 +25,8 @@ public class MapActivity extends Activity {
 	private HashMap<Marker, MyMarker> mMarkersHashMap;
 	//it carries all MyMarker objects
     private ArrayList<MyMarker> mMyMarkersArray = new ArrayList<MyMarker>();
-	
-   
-    
+    public PhotographsDataSource dataSource;
+    public List<Photographs> photos = new ArrayList<Photographs>();
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -35,7 +34,7 @@ public class MapActivity extends Activity {
 		
 		//initilization 
 		mMarkersHashMap = new HashMap<Marker, MyMarker>();
-		myMarkerObjects(mMyMarkersArray);
+		//myMarkerObjects(mMyMarkersArray);
 		try{
 			//initialize GPS
 			GPSTracker gps = new GPSTracker(this);
@@ -54,6 +53,19 @@ public class MapActivity extends Activity {
 				googleMap.moveCamera(CameraUpdateFactory.newLatLng(location));
 				//set zoom level to 12 and map centers there 
 				googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(location, 12.0f));
+				
+				// Initialize the HashMap for Markers and MyMarker object
+		        mMarkersHashMap = new HashMap<Marker, MyMarker>();
+
+		        //new datasource within this activuty context
+		    	dataSource = new PhotographsDataSource(this);
+		    	//open connection with datasource
+		    	dataSource.open();
+		    	photos = dataSource.getPhotographs();
+		    	for(Photographs photo : photos){
+		    		mMyMarkersArray.add(new MyMarker(photo._name, Double.parseDouble(photo.getLatitude()),  Double.parseDouble(photo.getLongitude())));
+		    		
+		    	}
 				plotMarkers(mMyMarkersArray);
 			} else {
 				gps.showSettingsAlert();
@@ -76,7 +88,8 @@ public class MapActivity extends Activity {
 	 ---------------------------------------------------------------------------------------------------------------------------------------------------------------*/ 
 	
 	private void myMarkerObjects(ArrayList<MyMarker> myMarkersArray){
-		DatabaseHandler dbHandler = new DatabaseHandler(this);
+		PhotographsDataSource dbHandler = new PhotographsDataSource(this);
+		dbHandler.open();
 		List<Photographs> list = dbHandler.getPhotographs();
 		for(Photographs photograph : list){
 			myMarkersArray.add(new MyMarker(photograph.getName(), Double.valueOf(photograph.getLongitude()), Double.valueOf(photograph.getLatitude())));

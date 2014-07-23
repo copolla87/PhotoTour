@@ -2,6 +2,7 @@ package com.example.phototour;
 import com.example.phototour.GPSTracker;
 
 import java.io.File;
+import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -9,6 +10,7 @@ import java.util.Locale;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -30,40 +32,49 @@ public class CameraActivity extends Activity {
 
 	private ImageView imgPreview;
 	GPSTracker gps;
-	
+	public PhotographsDataSource dataSource;
+	String timeStamp;
+	String latitude;
+	String longitude;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_camera);
-		
+		setContentView(R.layout.activity_camera);		
 		try {
 			//opening GPSTracker
 			GPSTracker gps = new GPSTracker(this);
 			gps = new GPSTracker(CameraActivity.this);
 			if(gps.canGetLocation()){
-				double latitude = gps.getLatitude();
-				double longitude = gps.getLongitude();
+				latitude = String.valueOf(gps.getLatitude());
+				longitude = String.valueOf(gps.getLongitude());
 			} else {
 				gps.showSettingsAlert();
 			} 	
 		} finally{
 			//TODO
 		}
-		
 	     imgPreview = (ImageView) findViewById(R.id.imgPreview);
-	    
-	     captureImage();
-	    	
-	     
+	     timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
+	     captureImage();     
 	}
 	
-	//icture captured or user cancelled
+	//picture captured or user cancelled
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data)
 	{
 	    if (requestCode == CAMERA_CAPTURE_IMAGE_REQUEST_CODE && resultCode == RESULT_OK){
+	    	timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
+	    	//new datasource within this activuty context
+	    	dataSource = new PhotographsDataSource(this);
+	    	//open connection with datasource
+	    	dataSource.open();
+	    	//call addPhotograph() and insert new photo data
+		    dataSource.addPhotograph(fileUri.getPath(), latitude, longitude, timeStamp);
+		    //close datasource connection
+		    dataSource.close();
+		    //add photograph to default android gallery
 	    	galleryAddPic();
-	    	//newPhotograph(imgPreview);
+	    	//preview captured image with imageView
 	    	previewCapturedImage();
 	    } else if (resultCode == RESULT_CANCELED){
 	    	Toast.makeText(getApplicationContext(), "user cancelled", Toast.LENGTH_SHORT).show();
@@ -80,22 +91,36 @@ public class CameraActivity extends Activity {
 	}
 	*/
 	
+	@Override
+	protected void onResume() {
+	    // TODO Auto-generated method stub
+		//dataSource.open();
+	    super.onResume();
+	}
+
+	@Override
+	protected void onPause() {
+	    // TODO Auto-generated method stub
+		/*
+		if(dataSource != null){
+			dataSource.close();
+		}
+		*/
+	    super.onPause();
+	}
+	
 	//Null pointer exception if not added 
 	@Override
 	protected void onSaveInstanceState(Bundle outState){
 		super.onSaveInstanceState(outState);
-		outState.putParcelable("file_uri", fileUri);
-		
-		
+		outState.putParcelable("file_uri", fileUri);	
 	}
 	
 	//Null pointer exception if not added 
 	@Override
 	protected void onRestoreInstanceState(Bundle savedInstanceState){
 		super.onRestoreInstanceState(savedInstanceState);
-		
 		fileUri = savedInstanceState.getParcelable("file_uri");
-		
 	}
 	
 	
@@ -116,7 +141,7 @@ public class CameraActivity extends Activity {
 		Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 		fileUri = getOutputMediaFileUri(MEDIA_TYPE_IMAGE);
 		intent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
-		startActivityForResult(intent, CAMERA_CAPTURE_IMAGE_REQUEST_CODE); 
+		startActivityForResult(intent, CAMERA_CAPTURE_IMAGE_REQUEST_CODE);
 	}
 	
 	public Uri getOutputMediaFileUri(int type){
@@ -126,15 +151,12 @@ public class CameraActivity extends Activity {
 	private static File getOutputMediaFile(int type){
 		File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
 				IMAGE_DIRECTORY_NAME);
-		
 		if(!mediaStorageDir.exists()){
-			
 			if(!mediaStorageDir.mkdirs()){
 				Log.d(IMAGE_DIRECTORY_NAME,"Failed create" + IMAGE_DIRECTORY_NAME + "directory");
 				return null;
 			}
-		}
-		
+		}	
 		String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
 		File mediaFile;
 		if(type == MEDIA_TYPE_IMAGE){
@@ -145,6 +167,7 @@ public class CameraActivity extends Activity {
 		return mediaFile;
 	}
 	
+	//preview captured image within ImageView, after the image is decoded as a bitmap
 	private void previewCapturedImage(){
 		try{
 			imgPreview.setVisibility(View.VISIBLE);
@@ -167,26 +190,37 @@ public class CameraActivity extends Activity {
 	}
 	
 	//add photograph to database(with slightly different name though - need fix)
-	private void newPhotograph(View view){
+	public void newPhotograph(View view){
+		/*
 		String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
 		DatabaseHandler dbHandler = new DatabaseHandler(this);
-		Photographs photograph = new Photographs(timeStamp.toString(), String.valueOf(gps.getLatitude()), String.valueOf(gps.getLongitude()), timeStamp.toString());
-		dbHandler.addPhotograph(photograph);
+		dbHandler.open();
+		//Photographs photograph = new Photographs(timeStamp.toString(), String.valueOf(gps.getLatitude()), String.valueOf(gps.getLongitude()), timeStamp.toString());
+		dbHandler.addPhotograph(timeStamp.toString(), String.valueOf(gps.getLatitude()), String.valueOf(gps.getLongitude()), timeStamp.toString());
+		dbHandler.close();
+		*/
+		
 	}
-	
-	
-	//method for button over image view to returns as on camera activity
-	public void cameraActivity(View view){
-		Intent cameraIntent = new Intent(this,
-                CameraActivity.class);
-		startActivity(cameraIntent);
+		
+	//method for button over image view to return us on camera activity
+	public void cameraActivity(View view){	
+		//finish activity
 		finish();
+		//kill imgPreview so we wont get outOfMemory
+		imgPreview.setImageBitmap(null);
+		//launches new camera activity on click
+		Intent cameraIntent = new Intent(this, CameraActivity.class);
+		startActivity(cameraIntent);
 	}
 	
-	//method for button over image view to send as to Map activity
+	//method for button over image view to send us to Map activity
 	public void mapActivity(View view){
+		//finish activity
+		finish();
+		//kill imgPreview so we wont get outOfMemory
+		imgPreview.setImageBitmap(null);
+		//launches map activity on click
 		Intent mapIntent = new Intent(this, MapActivity.class);
 		startActivity(mapIntent);
-		finish();
 	}
 }
